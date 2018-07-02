@@ -9,31 +9,31 @@ import os
 def to_txt(l, path = 'text_file.txt', overwrite = False, verbose = False):
 
 #Docstring
-	'''
-	Saves a list to a .txt file.
+    '''
+    Saves a list to a .txt file.
 
-	--------------
-	
-	l : list, default is None
-		List object to be saved.  
-	
-	path : str, default is 'text_file.txt'
-		File path (with file name) you want to save to.  
-	
-	overwrite : bool, default is False  
-		Overwrites the file if it exists.
-		
-	verbose : boolean, default is False
-		Prints out a message if the operation was succesful
-		
-	--------------
+    --------------
+    
+    l : list, default is None
+        List object to be saved.  
+    
+    path : str, default is 'text_file.txt'
+        File path (with file name) you want to save to.  
+    
+    overwrite : bool, default is False  
+        Overwrites the file if it exists.
+        
+    verbose : boolean, default is False
+        Prints out a message if the operation was succesful
+        
+    --------------
 
-	Examples :
-	
-	rk.to_txt(var_list, './Documents/vars.txt', verbose = True)
-	>> File successfully written to ./Documents/doc.txt
-	'''
-	
+    Examples :
+    
+    rk.to_txt(var_list, './Documents/vars.txt', verbose = True)
+    >> File successfully written to ./Documents/doc.txt
+    '''
+    
     if type(l) == list:
         if overwrite == True:
             try: 
@@ -61,36 +61,36 @@ def to_txt(l, path = 'text_file.txt', overwrite = False, verbose = False):
                 raise ValueError(f"Could not write on file : {path}")
     else :
         raise ValueError(f"Parameter l is not a list")
-		
+        
 # rk.read_txt()
 
 def read_txt(path = 'text_file.txt', verbose = False):
 
 #Docstring
-	'''
-	Reads from a text file, saving the result as a list, where each line is one item.
-	
-	--------------
-	
-	path : str, default = 'text_file.txt'
-		File path (with file name) you want to read from. Can be any type of file (.txt, .csv...)  
-	
-	verbose : boolean, default is False
-		Prints out a message if the operation was succesful
-		
-	--------------
+    '''
+    Reads from a text file, saving the result as a list, where each line is one item.
+    
+    --------------
+    
+    path : str, default = 'text_file.txt'
+        File path (with file name) you want to read from. Can be any type of file (.txt, .csv...)  
+    
+    verbose : boolean, default is False
+        Prints out a message if the operation was succesful
+        
+    --------------
 
-	Examples :
-	
-	var_list = rk.read_txt('./Documents/vars.txt', verbose = True)
-	>> File successfully read from ./Documents/vars.txt
-	'''
-	
-	if os.access(path, os.R_OK) == False:
-	    raise ValueError(f"No read permissions for the file : {path}. Verify that the file exists")
-	else:
-	    with open(path) as file:
-	        l = file.read().splitlines()
-			if verbose == True :
-	        		print(f'File successfully read from {path}')
-	        return l
+    Examples :
+    
+    var_list = rk.read_txt('./Documents/vars.txt', verbose = True)
+    >> File successfully read from ./Documents/vars.txt
+    '''
+    
+    if os.access(path, os.R_OK) == False:
+        raise ValueError(f"No read permissions for the file : {path}. Verify that the file exists")
+    else:
+        with open(path) as file:
+            l = file.read().splitlines()
+            if verbose == True :
+                    print(f'File successfully read from {path}')
+            return l
