@@ -1,5 +1,5 @@
 # rkpython
-# Various functions for personal use
+# Python module containing various functions for personal use
 
 # dependencies
 import os

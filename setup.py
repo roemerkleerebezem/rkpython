@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="rkpython",
-    version="0.0.1",
+    version="0.0.2",
     author="Roemer Kleerebezem",
     author_email="roemer.kleerebezem@gmail.com",
-    description="Various functions for personal use",
+    description="Python module containing various functions for personal use",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/roemerkleerebezem/rkpython",

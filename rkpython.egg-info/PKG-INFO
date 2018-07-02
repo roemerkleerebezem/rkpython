@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: rkpython
-Version: 0.0.1
-Summary: Various functions for personal use
+Version: 0.0.2
+Summary: Python module containing various functions for personal use
 Home-page: https://github.com/roemerkleerebezem/rkpython
 Author: Roemer Kleerebezem
 Author-email: roemer.kleerebezem@gmail.com
