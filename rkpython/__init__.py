@@ -424,14 +424,14 @@ class timer:
         start_time = time.time()
         return None
             
-    def end(step = "Execution time"):
+    def end(step = "Time"):
     # Docstring
         """
         Prints out the time elapsed since the rk.timer.start() call.
         
         --------------
         
-        step : str or int, default "  time"
+        step : str or int, default "Time"
 
         --------------
 

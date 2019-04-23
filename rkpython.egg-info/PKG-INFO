@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: rkpython
-Version: 0.0.23
+Version: 0.0.24
 Summary: Python module containing various functions
 Home-page: https://github.com/roemerkleerebezem/rkpython
 Author: Roemer Kleerebezem
@@ -9,8 +9,7 @@ License: UNKNOWN
 Description: # rkpython
         
         ## Description
-        This is a general use Python module.
-        For now, it only contains some functions to make reading and **writing to text files** easier, as well as a function that returns information for reading csv files**.
+        Module containing some general purpose functions, such as a timer, 
           
         ## Installation
         Use  
@@ -197,6 +196,53 @@ Description: # rkpython
             ['price_without_tax',
              'price_with_tax']
             
+        
+        ### `rk.humantime(ms)`
+        
+            Converts timespan in milliseconds to a humanly readable string.
+            
+            --------------
+            
+            ms : int or float
+                Time in milliseconds
+        
+            --------------
+        
+            Examples :
+            
+            >>> humantime(194159)
+            '3 min, 14 sec, 159 ms'
+        	
+        
+        ### `rk.timer`
+        
+            Class for measuring elapsed time.
+            Contains the rk.timer.start() function to save the current time, and the rk.timer.end() to print out the elapsed time.
+        
+            --------------
+            
+            Example :
+            >>> rk.timer.start()
+            >>> time.sleep(2)
+            >>> rk.timer.end("Sleep time")
+            [Sleep time] : 2 sec, 2 ms
+        
+        
+        ### `rk.timer.start()` & `rk.timer.end(step = "Time")`
+        
+        	rk.timer.start() saves the current time as a global variable, then prints out the time elapsed with rk.timer.end()
+        	
+        	--------------
+        	
+        	step : str or int, default "Time"
+        
+        	--------------
+        
+        	Example :
+        	>>> rk.timer.start()
+        	>>> time.sleep(2)
+        	>>> rk.timer.end("Sleep time")
+        	[Sleep time] : 2 sec, 2 ms
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License

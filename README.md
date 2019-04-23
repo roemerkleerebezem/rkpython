@@ -220,13 +220,13 @@ import rkpython as rk
     [Sleep time] : 2 sec, 2 ms
 
 
-### `rk.timer.start()` & `rk.timer.end(step = "Execution time")`
+### `rk.timer.start()` & `rk.timer.end(step = "Time")`
 
 	rk.timer.start() saves the current time as a global variable, then prints out the time elapsed with rk.timer.end()
 	
 	--------------
 	
-	step : str or int, default "  time"
+	step : str or int, default "Time"
 
 	--------------
 
