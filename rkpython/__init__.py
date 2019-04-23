@@ -1,10 +1,14 @@
 # rkpython
-# Python module containing various functions for personal use
+# Python module containing various functions
 
 # dependencies
 import os
 import operator
 import sys
+import csv
+import chardet
+import pandas as pd
+import time
 
 # rk.to_txt()
 def to_txt(l, path = 'text_file.txt', overwrite = False, verbose = False):
@@ -31,8 +35,8 @@ def to_txt(l, path = 'text_file.txt', overwrite = False, verbose = False):
 
     Examples :
     
-    rk.to_txt(var_list, './documents/vars.txt', verbose = True)
-    >> File successfully written to ./documents/vars.txt
+    >>> rk.to_txt(var_list, './documents/vars.txt', verbose = True)
+    File successfully written to ./documents/vars.txt
     '''
     
     if type(l) == list:
@@ -82,8 +86,8 @@ def read_txt(path = 'text_file.txt', verbose = False):
 
     Examples :
     
-    var_list = rk.read_txt('./documents/vars.txt', verbose = True)
-    >> File successfully read from ./documents/vars.txt
+    >>> var_list = rk.read_txt('./documents/vars.txt', verbose = True)
+    File successfully read from ./documents/vars.txt
     '''
     
     if os.access(path, os.R_OK) == False:
@@ -94,50 +98,36 @@ def read_txt(path = 'text_file.txt', verbose = False):
             if verbose == True :
                     print(f'File successfully read from {path}')
             return l
-			
-# rk.to_size()
-def to_size(size_in_bytes):
 
-#Docstring
+
+# rk.h_size()
+def h_size(size):
+    
+# Docstring
     '''
-    Converts a number of bytes into a more readable unit, up until Terabytes, and rounds the number down to 1 decimal. Returns a string.
+    Converts a size in bytes to a humanly readable size, with 1 decimal number. Input an integer, returns a string.
     
     --------------
         
-    size_in_bytes : int
-        Size in bytes that needs to be converted
+    size : float, int
+        Size of the object you want to convert, in bytes.
         
     --------------
 
     Examples :
     
-    get_size(124480000)
-    >> '124.5 Mb'
+    >>>  h_size(67108864)
+    '64.0 Mb'
     '''
-    if type(size_in_bytes) not in [int, float]:
-        raise ValueError('Expected a float or integer.')
-    else :
-        power = 0
-        while (abs(size_in_bytes) > 700) & (power < 4):
-            size_in_bytes = size_in_bytes/1000
-            power += 1
+    
+    for unit in ['b','Kb','Mb','Gb','Tb','Pb','Eb','Zb']:
+        if abs(size) < 1024.0:
+            return "%3.1f %s" % (size, unit)
+        size /= 1024.0
+    return "%.1f %s" % (size, 'Yb')
 
-        if power == 0:
-            power = 'Byte'
-        elif power == 1:
-            power = 'Kb'
-        elif power == 2:
-            power = 'Mb'
-        elif power == 3 :
-            power = 'Gb'
-        elif power == 4 :
-            power = 'Tb'
-        else :
-            power = '[Error in determining size]'
 
-        return_str = f'{round(size_in_bytes, 1)} {power}'
-        return return_str
-		
+
 # rk.get_mem()
 def get_mem(nb_objects = 10):
 
@@ -154,15 +144,15 @@ def get_mem(nb_objects = 10):
 
     Examples :
     
-    get_mem(5)
-    >> Total usage : 25.3 Gb
-    >>
-    >>  5 largest objects :
-    >>  _477  :  1.7 Gb
-    >>  _529  :  1.7 Gb
-    >>  _437  :  1.4 Gb
-    >>  _412  :  1.3 Gb
-    >>  _415  :  1.3 Gb
+    >>> get_mem(5)
+    Total usage : 25.3 Gb
+    
+     5 largest objects :
+     _477  :  1.7 Gb
+     _529  :  1.7 Gb
+     _437  :  1.4 Gb
+     _412  :  1.3 Gb
+     _415  :  1.3 Gb
     '''
     if type(nb_objects) != int:
         raise ValueError('Expected an integer.')
@@ -180,11 +170,279 @@ def get_mem(nb_objects = 10):
 
         mem_total = sum(obj_dict.values())
 
-        mem_total = to_size(mem_total)
+        mem_total = h_size(mem_total)
 
         print(f'Total usage : {mem_total}')
         nb_objects = min(nb_objects, len(sorted_dict))
 
         print(f'\n{nb_objects} largest objects :')
         for i in range(nb_objects):
-            print(sorted_dict[i][0], ' : ', to_size(sorted_dict[i][1]))
+            print(sorted_dict[i][0], ' : ', h_size(sorted_dict[i][1]))
+
+
+# rk.csv_info()
+class csv_info:
+
+    '''
+    Returns information about a csv or text file, such as the encoding and separators infered using csv's Sniffer() function.
+    
+    --------------
+        
+    file : str
+        Path to the file you want to read.
+        
+    --------------
+    
+    csv_info().size :
+        Returns the size of the file as a string.
+
+    csv_info().separator :
+        Returns the infered separator as a string.
+        
+    csv_info().quotechar :
+        Returns the infered quote character as a string, defaults to ["].
+        
+    csv_info().encoding :
+        Returns the infered encoding using chardet. Defaults to ascii.
+        
+    csv_info().rawdata :
+        Returns a 8192 byte sample of the file, unencoded.
+
+    csv_info().rows :
+        Returns the number of rows in the csv file.        
+        
+    csv_info().columns :
+        Returns the columns of the csv file.
+            
+    csv_info().parameters :
+        Returns the separator, quotechar and encoding of the file to plug them in pandas or dask.        
+            
+    csv_info().info() :
+        Prints out the main characteristics of the file.
+
+    --------------
+
+    Examples :
+    
+    >>> csv_info("table.csv").encoding
+    'utf-8'
+    
+    >>> sep, quotechar, encoding = csv_info("table.csv").parameters
+    >>> df = pandas.read_csv("table.csv", sep=sep, quotechar=quotechar, encoding=encoding)
+    >>> print(sep, quotechar, encoding)
+    ; " utf-8
+    '''
+
+    def __init__(self, file):
+        self.size = h_size(os.path.getsize(file))
+
+        with open(file, mode='rb') as f:
+            self.rawdata = f.read(8192)
+
+            self.encoding = chardet.detect(self.rawdata)['encoding']
+            if self.encoding == 'ascii':
+                self.encoding = 'utf8'
+                print('Detected ascii encoding, changed to utf8 for safety')
+ 
+        with open(file, mode='r', encoding=self.encoding) as f:
+
+            self.dialect = csv.Sniffer().sniff(f.read(8192))
+
+            self.separator = self.dialect.delimiter
+            self.quotechar = self.dialect.quotechar
+
+
+        with open(file, mode='r', encoding=self.encoding) as f:
+            self.columns = [col.rstrip('\n') for col in f.readline().split(self.separator)]
+
+            # Count rows
+            for rows, l in enumerate(f):
+                pass
+            self.rows = rows + 1
+            
+        self.file = file
+
+        self.parameters = iter([self.separator, self.quotechar, self.encoding])
+
+    def info(this):
+
+        print(f"""---- {os.path.basename(this.file)} ----
+        
+size       : {this.size}
+separator  : {this.separator}
+quotechar  : {this.quotechar}
+encoding   : {this.encoding}
+
+{"{:,}".format(this.rows)} rows, {"{:,}".format(len(this.columns))} columns""")
+
+
+# rk.sql_dict()
+def mysql_dict(con, db_filter = '.*', table_filter = '.*', col_filter = '.*', strict=False) :
+
+#Docstring
+    '''
+    Creates a dictionary listing all databases, tables and columns of a MySql server. Results can be filtered using regex.
+    
+    --------------
+    
+    con : SQLAlchemy connectable (engine/connection) or database string URI or DBAPI2 connection (fallback mode)
+    
+    db_filter : str or list of str, default is '.*'
+        Filters on databases containing the specified regular expression(s).
+    
+    table_filter : str or list of str, default is '.*'
+        Filters on tables containing the specified regular expression(s).
+  
+    column_filter : str or list of str, default is '.*'
+        Filters on columns containing the specified regular expression(s).
+        
+    strict : boolean, default is False
+        Returns only strict matches instead of partial matches.
+        
+    --------------
+
+    Examples :
+    
+    >>> temp_dict = sql_dict(con = f'mysql://{user}:{pw}@{host}:{port}', col_filter = 'price')
+    >>> temp_dict.keys()
+    dict_keys(['products'])
+    >>> temp_dict['products'].keys()
+    dict_keys(['phones', 'laptops'])
+    >>> temp_dict['products']['phones']
+    ['price_without_tax',
+     'price_with_tax']
+    '''
+    
+    con_dict = {}
+    
+    filter_dict = {'db_filter' : db_filter, 
+                  'table_filter': table_filter,
+                  'col_filter': col_filter}
+
+    for var in filter_dict:
+        if not isinstance(filter_dict[var], list):
+            filter_dict[var] = [filter_dict[var]]
+        filter_dict[var] = '|'.join("^"*strict + term + "$"*strict for term in filter_dict[var] if term != '')
+    
+    con_df = pd.read_sql(
+f'''
+select table_schema, table_name, column_name from information_schema.columns
+where table_schema regexp '{filter_dict["db_filter"]}'
+and table_name regexp '{filter_dict["table_filter"]}'
+and column_name regexp '{filter_dict["col_filter"]}'
+''', con
+)
+    for db in set(con_df['table_schema']) :
+        db_df = con_df[con_df['table_schema'] == db]
+        db_dict = {}
+        for table in set(db_df['table_name']):
+            table_df = db_df[db_df['table_name']==table]
+            column_list = list(table_df['column_name'])
+            if len(column_list) != 0 :
+                db_dict[table] = column_list
+        if len(db_dict) != 0:
+            con_dict[db] = db_dict
+    
+    return con_dict
+
+
+# rk.humantime()
+def humantime(ms):
+
+# Docstring
+    """
+    Converts timespan in milliseconds to a humanly readable string.
+    
+    --------------
+    
+    ms : int or float
+        Time in milliseconds
+
+    --------------
+
+    Examples :
+    
+    >>> humantime(194159)
+    '3 min, 14 sec, 159 ms'
+    """
+    
+    time_dict = {'ms' : ms}
+
+    time_dict['sec'] = time_dict['ms'] // 1000
+    time_dict['ms'] -= 1000 * time_dict['sec']
+    time_dict['min'] = time_dict['sec'] // 60
+    time_dict['sec'] -= 60 * time_dict['min']
+    time_dict['hs'] = time_dict['min'] // 60
+    time_dict['min'] -= 60 * time_dict['hs']
+    time_dict['days'] = time_dict['hs'] // 24
+    time_dict['hs'] -= 24 * time_dict['days']
+    
+    time_str = ""
+    for key in reversed([key for key in time_dict.keys()]):
+        if time_dict[key] != 0 :
+            time_str = f"{time_str}{time_dict[key]} {key}, "
+            
+    time_str = time_str.rstrip(', ')
+    
+    return time_str
+	
+
+# rk.timer.start() / rk.timer.end()
+class timer:
+    # Docstring
+    """
+    Class for measuring elapsed time.
+    Contains the rk.timer.start() function to start counting, and the rk.timer.end() to print out the timespan.
+
+    --------------
+    
+    Example :
+    >>> rk.timer.start()
+    >>> time.sleep(2)
+    >>> rk.timer.end("Sleep time")
+    [Sleep time] : 2 sec, 2 ms
+    """
+
+    def __init__(self):
+        return None
+
+    def start():
+    # Docstring
+        """
+        Saves the time as a global variable.
+
+        --------------
+
+        Example :
+        >>> rk.timer.start()
+        >>> time.sleep(2)
+        >>> rk.timer.end("Sleep time")
+        [Sleep time] : 2 sec, 2 ms
+        """
+        
+        global start_time
+        start_time = time.time()
+        return None
+            
+    def end(step = "Execution time"):
+    # Docstring
+        """
+        Prints out the time elapsed since the rk.timer.start() call.
+        
+        --------------
+        
+        step : str or int, default "  time"
+
+        --------------
+
+        Example :
+        >>> rk.timer.start()
+        >>> time.sleep(2)
+        >>> rk.timer.end("Sleep time")
+        [Sleep time] : 2 sec, 2 ms
+        """
+        global start_time
+        try :
+            print(f"[{step}] : {humantime(round((time.time() - start_time)*1000))}")
+        except NameError:
+            print('No starttime')
