@@ -1,7 +1,7 @@
 # rkpython
 
 ## Description
-Module containing some general purpose functions, such as a timer, 
+Module containing some general purpose functions.
   
 ## Installation
 Use  
@@ -40,6 +40,7 @@ import rkpython as rk
     >>> rk.to_txt(var_list, './documents/vars.txt', verbose = True)
     File successfully written to ./documents/vars.txt
 
+---
 	
 ### `rk.read_txt(path = 'text_file.txt', verbose = False)`  
 
@@ -60,6 +61,7 @@ import rkpython as rk
     >>> var_list = rk.read_txt('./documents/vars.txt', verbose = True)
     File successfully read from ./documents/vars.txt
 
+---
 	
 ### `rk.h_size(size)`
 
@@ -78,6 +80,8 @@ import rkpython as rk
     >>>  h_size(67108864)
     '64.0 Mb'
 	
+---
+
 ### `rk.get_mem(nb_objects = 10)` 
   
 **Warning :** this function can't access the global variables so doesn't currently work. You can however copy the function from the source code and define it in your python session so that it will access the right variables.
@@ -103,6 +107,7 @@ import rkpython as rk
      _412  :  1.3 Gb
      _415  :  1.3 Gb
 	
+---
 
 ### `rk.csv_info(file)`
 
@@ -154,6 +159,7 @@ import rkpython as rk
     >>> print(sep, quotechar, encoding)
     ; " utf-8
 
+---
 
 ### `rk.sql_dict(con, db_filter = '.*', table_filter = '.*', col_filter = '.*', strict=False)`
 
@@ -188,6 +194,7 @@ import rkpython as rk
     ['price_without_tax',
      'price_with_tax']
     
+---
 
 ### `rk.humantime(ms)`
 
@@ -205,6 +212,7 @@ import rkpython as rk
     >>> humantime(194159)
     '3 min, 14 sec, 159 ms'
 	
+---
 
 ### `rk.timer`
 
@@ -219,6 +227,7 @@ import rkpython as rk
     >>> rk.timer.end("Sleep time")
     [Sleep time] : 2 sec, 2 ms
 
+---
 
 ### `rk.timer.start()` & `rk.timer.end(step = "Time")`
 
